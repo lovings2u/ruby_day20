@@ -1,127 +1,102 @@
-# 20180704_Day17
+# 20180705_day18
 
-### Javascript & jQuery
+### ajax
 
-```javascript
-// 버튼(요소)에 마우스를 오버(이벤트) 했더니(이벤트 리스너)
-// 그 위에있던 글자(요소)들이 갑자기 이상한 글자로 변해버린다(이벤트 핸들러).
-// var index = 1;
-// var text = document.getElementsByClassName("card-title")[index].innerText;
-// var btn = document.getElementsByClassName("btn")[index];
+- ajax를 이용하면 각종 single page applicaion 구성이 가능해진다. 한개의 페이지에서 이동 없이 지속적으로 서버와 통신하며 사용자의 입력사항을 저장하고 수정할 수 있다. (하지만 모든 기능들을 ajax 코드로 구현하는 끔찍한 일을 막기 위해서 프론트앤드 자바스크립트 프레임워크/라이브러리, 예를들어 angular, vue, react 등과 같은 기술이 나오고 있다.) ajax와 javascript/jquery에 익숙해지기 위해 댓글을 구현해보고자 한다.
 
-// btn.addEventListener("mouseover", function() {
-//   var title = document.getElementsByClassName("card-title")[index];
-//   console.dir(title);
-//   title.innerText = "Don't Touch me..";
-// });
 
-// btn.addEventListener("mouseout", function() {
-//   var title = document.getElementsByClassName("card-title")[index];
-//   title.innerText = text;
-// })
-// 익명함수
 
-// 버튼(요소)에 마우스를 올리면(이벤트, 이벤트 리스너)
-// 해당 버튼(요소)의 class가 btn btn-danger로 변함(이벤트 핸들러)
-var btn = document.getElementsByClassName("btn")[0];
-btn.addEventListener("mouseover", function() {
-  btn.setAttribute("class", "btn btn-danger");
-})
+*db/migrate/create_comments.rb*
 
-btn.addEventListener("mouseout", function() {
-  btn.setAttribute("class", "btn btn-primary");
-})
+```ruby
+class CreateComments < ActiveRecord::Migration[5.0]
+  def change
+    create_table :comments do |t|
+      t.integer         :user_id
+      t.integer         :movie_id
+      t.string          :contents
+
+      t.timestamps
+    end
+  end
+end
 ```
 
-- 코드를 구성할 때 해결하고자 하는 문제를 한번에 해결하는 것이 아니라 단계적 구성이 필요하다. 문제를 세분화하고 해당 문제를 해결하기까지 어떤 과정이 있을지 고민하는 것이 더 나은 코드를 위한 시발점이 될 것 같다. 문제 상황이 주어지면 먼저 키보드부터 누르는 것이 아니라 해당 문제의 시발점과 도착점을 찾고 시발점에서 도착점까지 나아가기 위한 과정을 나열하다보면 그 나열된 항목들이 모두 코드를 짜는 기초가 될 것이다. 만약 나열된 과정조차 어렵다면 그 문제를 더 세분화 해보길 바란다.
+- 댓글을 등록하기 위한 모델을 만들어준다. 생각해보면 이 comment 모델도 조인테이블로 활용할 수 있다. 하지만 실제로 M:N의 관계를 만들어주는 것은 지난 시간에 구현한 Like 모델이므로 추가적인 설정은 하지 않는다.
 
+*app/models/comment.rb*
 
-
-### jQuery
-
-- jQuery(요소 선택자, 이벤트 리스너)
-
-```javascript
-// $('.btn').이벤트명(이벤트핸들러)
-$('.btn').mouseover(function() {
-    alert("건드리지마 ㅠㅠ 아프니까 ㅠㅠ");
-})
+```ruby
+class Comment < ApplicationRecord
+    belongs_to :user
+    belongs_to :movie
+end
 ```
 
-- **마우스가 버튼위에 올라갔을때, 버튼에 있는 btn-primary 클래스를 삭제하고 btn-danger 클래스를 준다. 버튼에서 마우스가 내려왔을 때 다시 btn-danger 클래스를 삭제하고 btn-primary클래스를 추가한다.**
-- 여러개의 이벤트 등록하기.
-- 요소에 class를 넣고 빼는 jQuery function을 찾기.
+*app/models/movie.rb*
 
-
-
-#### 간단과제
-
-- 텍스트 변환기(오타치는 사람 놀리기)
-
-*index.html*
-
-```html
-<textarea id="input" placeholder="변환할 텍스트를 입력해주세요."></textarea>
-<button class="translate">바꿔줘</button>
-<h3></h3>
+```ruby
+...
+    has_many :comments
+...
 ```
 
-- input에 들어있는 텍스트 중에서 '관리' -> '고나리', '확인' -> '호가인', '훤하다' -> '허누하다' 의 방식으로 텍스트를 오타로 바꾸는 이벤트 핸들러 작성하기
-- https://github.com/e-/Hangul.js 에서 라이브러리를 받아서 자음과 모음을 분리하고, 다시 단어로 합치는 기능 살펴보기
-- `String.split('')` : `''`안에 있는 것을 기준으로 문자열을 잘라준다(return type: 배열)
-- `Array.join('')` : 배열에 들어있는 내용들을 `''`안에 있는 내용을 기준으로 합쳐줌
-- `Array.map(function(el){})` : 배열을 순회하면서 하나의 요소마다 function을 실행시킴(el: 순회하는 각 요소, return type: 새로운 배열)
+*app/models/user.rb*
 
-
-
->1. textarea에 있는 내용물을 가지고 오는 코드
->2. 버튼에 이벤트 리스너(click)를 달아주고, 핸들러에는 1번에서 작성한 코드를 넣는다.
->3. 1번 코드의 결과물을 한글자씩 분해해서 배열로 만들어준다.(split(''))
->4. 3번의 결과 배열에 4번째 요소가 있고 2,3번째 요소가 모음일 경우
->5. 3번째 모음과 4번째 자음을 바꿔준다.
->6. 결과물로 나온 배열을 문자열로 이어준다.('join')
->7. 결과물을 출력해줄 요소를 찾는다.
->8. 요소에 결과물을 출력한다.
-
-
-
-#### this 와 $(this)
-
-- 이벤트 핸들러 내에서의 this는 이벤트가 발생하고 있는 바로 그 요소를 나타낸다. javscript를 사용할 때 이 this에 어떤 값이 담기는 가는 매우 중요하다. 반드시 확인하고 넘어가길 바란다.
-
-```javascript
-$('.btn').on('mouseover', function() {
-    $(this).toggleClass('btn-primary btn-danger');
-})
+```ruby
+...
+    has_many :comments
+...
 ```
 
 
 
-###  ajax(Asynchronous JavaScript and XML )
+#### create_comment
 
-- 에이젝스라고 부르기도 하고, 아약스라고도 불리기도 한다. jQuery를 사용하면 이 ajax를 매우 쉽게 사용할 수 있다. 자바스크립트 ajax에 대해서는 다음 문서를 참고한다.
-- [참고1](https://developer.mozilla.org/ko/docs/Web/Guide/AJAX/Getting_Started), [참고2](https://opentutorials.org/course/1375/6843)
-- 레일즈에서 ajax를 구성하는 순서는 다음과 같다.
+- 댓글 등록이  동작하는 과정은 다음과 같다.
 
-> 1. view.html.erb에서 ajax요청을 만든다.
-> 2. ajax요청을 받기 위한 route를 설정한다
-> 3. route에서 설정한 컨트롤러#액션을 선언한다.
-> 4. 해당 액션의 로직을 수행한 후 응답으로 보낼 js.erb파일을 생성한다. 여기서 js파일명은 액션명과 일치하는 것을 원칙으로 한다.
+>- 댓글을 입력받을 폼을 작성
+>- form(요소)이 제출(이벤트)될 때(이벤트 리스너)
+>- form에 input(요소) 안에 있는 내용물(메소드)을 받아서
+>- ajax 요청으로 서버에 '/create/comment'로 요청을 보낸다.
+>- 보낼 때에는 내용물, 현재 보고있는 movie의 id 값도 같이 보낸다.
+>- 서버에서 저장하고, response 보내줄 js.erb 파일을 작성한다.
+>- js.erb 파일에서는 댓글이 표시될 영역에 등록된 댓글의 내용을 추가해준다.
 
-*app/views/movies/show.html.erb*
+- 레일즈 프로젝트에서 ajax를 구현하기 위해서는 다음과 같은 순서를 갖는다.
+
+> 1. ajax 코드를 작성한다. (`$.ajax({})`)
+> 2. url 을 지정한다.
+> 3. 해당 url을 *config/routes.rb*에서 controller#action을 지정한다.
+> 4. controller#action을 자성한다.
+> 5. *app/views/controller_name*에 action명과 일치하는 `js.erb` 파일을 작성한다.
+
+- 항상  잘 기억해두고 각 순서에 맞춰 구현하도록한다.
+
+*app/views/show.html.erb*
 
 ```erb
+<form class="text-right comment">
+    <input class="form-control comment-contents">
+    <input type="submit" value="댓글쓰기" class="btn btn-success">
+</form>
 ...
-<button class="btn btn-info like">좋아요</button>
 <script>
-$(document).on('ready', function() {
-    $('.like').on('click', function() {
-        console.log("like!!!");
-        $.ajax({
-           url: '/likes/<%= @movie.id %>' 
+    $(document).on('ready', function() {
+        $('.comment').on('submit', function(e) {
+            e.preventDefault();
+            var comm = $('.comment-contents').val();
+            console.log(comm);
+
+            $.ajax({
+                url: "/movies/<%= @movie.id %>/comments",
+                method: "POST",
+                data: {
+                    contents: comm
+                }
+            })
         });
     })
-});
 </script>
 ```
 
@@ -129,7 +104,88 @@ $(document).on('ready', function() {
 
 ```ruby
 ...
-    get '/likes/:movie_id' => 'movies#like_movie'
+  resources :movies do
+    member do
+      post '/comments' => 'movies#create_comment'
+    end
+  end
+...
+```
+
+- nested routing을 통해 조금 더 복잡한 라우팅을 쉽게 지정할 수 있다. 자세한 정보는 [이곳](http://guides.rubyonrails.org/routing.html#nested-resources)을 참조한다.
+
+> `member` : `/movies/:(movie_)id/`를 기본으로 추가적인 uri를 설정한다
+>
+> `collection` : `/movies/`를 기본으로 추가적인 uri를 설정한다.
+
+*app/controllers/movies_controller.rb*
+
+```ruby
+...  
+  def create_comment
+    # @movie = Movie.find(params[:id]) => filter에 create_comment를 추가한다.
+    @comment = Comment.create(user_id: current_user.id, movie_id: @movie.id, contents: params[:contents])
+  end
+..
+```
+
+*app/views/movies/create_comment.js.erb*
+
+```erb
+$('.comment-list').prepend(`
+<li class="comment-<%= @comment.id %> list-group-item d-flex justify-content-between">
+    <span class="comment-detail-<%= @comment.id %>"><%= @comment.contents %></span>
+    <div>
+        <button data-id="<%= @comment.id %>" class="btn btn-warning text-white edit-comment">수정</button>
+        <button data-id="<%= @comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+    </div>
+</li>`);
+$('.comment-contents').val('');
+alert("댓글 등록이 완료됐습니다.");
+```
+
+- 모든 과정을 차근히 진행하면 어렵지 않게 구현할 수 있다.
+
+
+
+#### destroy_comment
+
+- 등록되어 있는 댓글을 삭제하는 과정은 다음과 같다.
+
+> - 댓글에 있는 삭제 버튼(요소)을 누르면(이벤트 리스너)
+> - 해당 댓글이 눈에 안보이게 되고(이벤트 핸들러),
+> - 실제 DB에서도 삭제가 된다(ajax).
+
+- `create_comment`에서도 마찬가지 이지만, 실제로 이벤트 핸들러의 요소 추가 및 삭제는 ajax 요청에 대한 응답으로 돌아오는 js 코드에서 구현된다.
+
+*app/views/movies/show.html.erb*
+
+```erb
+...
+	$(document).on('click', '.destroy-comment', function() {
+        console.log("destroyed!!!");
+        var comment_id = $(this).attr('data-id');
+        // $(this).data('id');
+        console.log(comment_id);
+        $.ajax({
+            url: "/movies/comments/" + comment_id,
+            method: "delete"
+        })
+    });
+...
+```
+
+- 버튼 클릭의 이벤트 리스너가 기존과 다른 형태로 구현되어 있는 것을 알 수 있다.  해당 형태는 이벤트 핸들러르 등록하는 jQuery `.on`에서 앞서 선택된 요소의 자식중에서 두번째 매개변수에 있는 요소를 찾게된다. 우리가 `create_comment`에서 구현한 댓글 추가는 동적으로 추가한 요소이기 때문에 기존의 방식으로는 요소를 찾을 수 없고 이 방식을 통해 요소를 찾아야만 동적으로 추가된 요소를 찾을 수 있다. 자세한 정보는 [이곳](http://api.jquery.com/on/)을 참조한다.
+
+*config/routes.rb*
+
+```ruby
+...
+  resources :movies do
+    collection do
+      delete '/comments/:comment_id' => 'movies#destroy_comment'
+    end
+  end
 ...
 ```
 
@@ -137,36 +193,117 @@ $(document).on('ready', function() {
 
 ```ruby
 ...
-  def like_movie
-    p params
-    # 현재 유저와 params에 담긴 movie간의 
-    # 좋아요 관계를 설정한다. 끗
-    @like = Like.where(user_id: current_user.id, movie_id: params[:movie_id]).first
-    if @like.nil?
-      @like = Like.create(user_id: current_user.id, movie_id: params[:movie_id])
-    else
-      @like.destroy
-    end
-    # 만약에 현재 로그인한 유저가 이미 좋아요를 눌렀을 경우
-    # 해당 Like 인스턴스 삭제
-    # 새로 누른 경우
-    # 좋아요 관계 설정
+  def destroy_comment
+    @comment = Comment.find(params[:comment_id]).destroy
   end
 ...
 ```
 
-*app/views/movies/like_movie.js.erb*
+*app/views/movies/destroy_comment.js.erb*
 
 ```erb
-alert("좋아요 설정됐쩡");
-$('.like').text("좋아요 취소").toggleClass("btn-warning btn-info text-white");
-// 해당 부분은 과제임
-if(<%= @like.frozen? %>) {
-// 좋아요가 취소된 경우
-// 좋아요 취소버튼 -> 좋아요 버튼
-} else {
-// 좋아요가 새로 눌린 경우
-// 좋아요 버튼 -> 좋아요 취소
-}
+alert("댓글이 삭제 되었습니다.");
+$('.comment-<%= @comment.id %>').remove();
 ```
 
+- 삭제되는 요소를 정확히 찾기 위해서 삭제될 요소의 class에 id가 추가된 부분을 부여하여 삭제될 수 있도록 하였다. 이벤트 핸들러 내에 해당 코드가 있을 경우 `this`로 참조가 가능하지만 파일을 분리한 현재의 상태에서는 `this`의 참조값이  없는 상태이다.
+
+
+
+#### edit_comment & update_comment
+
+- 댓글을 수정하는 방식은 다양하지만 일단은 *어렵다..* 단계로 구분해도 많은 단계가 있기 때문이다.
+
+> - 수정 버튼(요소)을 클릭하면(이벤트 리스너)
+>
+> - 댓글이 있던 부분(요소)이 입력창(`.html()`)으로 바뀌면서 원래 있던 댓글의 내용(`.text()`)이 입력창에 들어간다.
+>
+> - 수정버튼은 확인 버튼으로 바뀐다.
+>
+>   ------
+>
+>   
+>
+> - 내용 수정 후 확인 버튼(요소)을 클릭하면(이벤트 리스너)
+>
+> - 입력창에 있던 내용물(`.val()`)이 댓글의 원래 형태로 바뀌고 
+>
+> - 확인버튼은 다시 수정버튼으로 바뀐다.
+>
+> - 입력창에 있던 내용물을 ajax로 서버에 요청을 보낸다.
+>
+> - 서버에서는 해당 댓글을 찾아 내용을 업데이트 한다.
+
+- 댓글을 수정할 때에는 두가지  과정을 거쳐야 하기 때문에 굉장히 단계가 많아 보인다. 또한 기존에는 추가/삭제만 하면 됐던 부분들에서 *수정*을 해야하기 때문에 구현에 어려움을 겪을 수 있다.
+
+*app/views/movies/show.html.erb*
+
+```erb
+...
+$(document).on('click', '.edit-comment', function() {
+        // console.log($(this).parent().parent().find('.comment-detail');
+        // console.log($(this).parent().siblings());
+        var comment_id = $(this).data('id');
+        var edit_comment = $(`.comment-detail-${comment_id}`);
+        var contents = edit_comment.text().trim();
+        edit_comment.html(`
+        <input type="text" value="${contents}" class="form-control edit-comment-${comment_id}">`);
+        $(this).text("확인").removeClass("edit-comment btn-warning").addClass("update-comment btn-dark");
+});
+...
+```
+
+- 현재 이벤트가 발생한, 즉 수정할 요소가 있는 곳을 찾기 위해 각 부분에 data-id와 id를 부여했다. 변수명과 클래스명을 헷갈리지 않도록 주의한다.
+- 여기까지 구현하면 수정 버튼을 눌렀을 때 댓글 출력부분이 form으로 바뀌고 입력할 수 있게 바뀐다.
+
+
+
+*app/views/movies/show.html.erb*
+
+```erb
+$(document).on('click', '.update-comment', function() {
+        var comment_id = $(this).data('id');
+        var comment_form = $(`.edit-comment-${comment_id}`);
+        $.ajax({
+            url: "/movies/comments/" + comment_id,
+            method: "patch",
+            data: {
+                contents: comment_form.val()
+            }
+        })
+});
+```
+
+*config/routes.rb*
+
+```erb
+...
+  resources :movies do
+    collection do
+      patch '/comments/:comment_id' => 'movies#update_comment'
+    end
+  end
+...
+```
+
+*app/controllers/movies_controller.rb*
+
+```ruby
+...
+  def update_comment
+    @comment = Comment.find(params[:comment_id])
+    @comment.update(contents: params[:contents])
+  end
+...
+```
+
+*app/views/movies/update_comment.js.erb*
+
+```erb
+alert("수정완료");
+var edit_comment = $('.comment-detail-<%= @comment.id %>');
+edit_comment.html('<%= @comment.contents %>');
+$('.update-comment').text("수정").removeClass("update-comment btn-dark").addClass("edit-comment btn-warning");
+```
+
+- 복잡한 코드가 일부 있지만 주어진 상황을 세분화 하여 진행하다보면 성공적으로 코드를 구현할 수 있다.

@@ -1,0 +1,4 @@
+alert("수정완료");
+var edit_comment = $('.comment-detail-<%= @comment.id %>');
+edit_comment.html('<%= @comment.contents %>');
+$('.update-comment').text("수정").removeClass("update-comment btn-dark").addClass("edit-comment btn-warning");

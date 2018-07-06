@@ -1,7 +1,7 @@
 class MoviesController < ApplicationController
   before_action :js_authenticate_user!, only: [:like_movie]
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_movie, only: [:show, :edit, :update, :destroy]
+  before_action :set_movie, only: [:show, :edit, :update, :destroy, :create_comment]
 
 
   # GET /movies
@@ -13,6 +13,8 @@ class MoviesController < ApplicationController
   # GET /movies/1
   # GET /movies/1.json
   def show
+    @user_likes_movie = Like.where(user_id: current_user.id, movie_id: @movie.id).first if user_signed_in?
+    p @user_likes_movie
   end
 
   # GET /movies/new
@@ -65,7 +67,6 @@ class MoviesController < ApplicationController
   end
 
   def like_movie
-    p params
     # 현재 유저와 params에 담긴 movie간의 
     # 좋아요 관계를 설정한다. 끗
     @like = Like.where(user_id: current_user.id, movie_id: params[:movie_id]).first
@@ -79,7 +80,20 @@ class MoviesController < ApplicationController
     # 해당 Like 인스턴스 삭제
     # 새로 누른 경우
     # 좋아요 관계 설정
-    
+  end
+  
+  def create_comment
+    # @movie = Movie.find(params[:id])
+    @comment = Comment.create(user_id: current_user.id, movie_id: @movie.id, contents: params[:contents])
+  end
+  
+  def destroy_comment
+    @comment = Comment.find(params[:comment_id]).destroy
+  end
+  
+  def update_comment
+    @comment = Comment.find(params[:comment_id])
+    @comment.update(contents: params[:contents])
   end
 
   private

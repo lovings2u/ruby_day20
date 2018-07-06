@@ -1,0 +1,10 @@
+$('.comment-list').prepend(`
+<li class="comment-<%= @comment.id %> list-group-item d-flex justify-content-between">
+    <span class="comment-detail-<%= @comment.id %>"><%= @comment.contents %></span>
+    <div>
+        <button data-id="<%= @comment.id %>" class="btn btn-warning text-white edit-comment">수정</button>
+        <button data-id="<%= @comment.id %>" class="btn btn-danger destroy-comment">삭제</button>
+    </div>
+</li>`);
+$('.comment-contents').val('');
+alert("댓글 등록이 완료됐습니다.");
