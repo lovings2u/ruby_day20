@@ -1,0 +1,6 @@
+console.log("찾음");
+$('.recomm-movie').html(`
+<% @movies.each do |movie| %>
+<span class="badge badge-primary"><%= movie.title %></span>&nbsp;&nbsp;
+<% end %>
+`);

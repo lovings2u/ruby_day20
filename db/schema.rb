@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(version: 20180705023658) do
     t.integer  "user_id"
     t.integer  "movie_id"
     t.string   "contents"
+    t.integer  "score"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
