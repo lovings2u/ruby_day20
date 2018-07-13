@@ -1,6 +1,6 @@
 <h1><%= @movie.title %></h1>
 <hr>
-<p><%= @movie.description %></p>
+<p><%= simple_format(@movie.description) %></p>
 <%= link_to 'Edit', edit_movie_path(@movie) %> |
 <%= link_to 'Back', movies_path %>
 <hr>
