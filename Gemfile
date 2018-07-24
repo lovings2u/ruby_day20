@@ -20,6 +20,8 @@ gem 'mini_magick'
 gem 'omniauth-google-oauth2'
 gem 'figaro'
 
+gem 'rest-client'
+
 # wysiwyg editor
 gem 'summernote-rails', '~> 0.8.10.0'
 

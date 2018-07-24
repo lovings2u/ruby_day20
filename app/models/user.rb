@@ -23,4 +23,23 @@ class User < ApplicationRecord
     end
     user
   end
+  
+  def self.from_omniauth_kakao(token)
+    user = User.where(provider: "kakao", uid: token["id"]).first
+    if user
+      user
+    else
+      if token["kakao_account"]["email"].present?
+        user_email = token["kakao_account"]["email"]
+      else
+        user_email = "#{token["id"]}@kakao.com"
+      end
+      user = User.create(email: user_email,
+                  password: Devise.friendly_token[0,20],
+                  name: token["properties"]["nickname"],
+                  uid: token["id"],
+                  provider: "kakao")
+    end
+    user
+  end
 end

@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/ahctaw', as: 'rails_admin'
   devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks' }
+  devise_scope :user do
+    get '/users/auth/kakao', to: 'users/omniauth_callbacks#kakao'
+    get '/users/auth/kakao/callback', to: 'users/omniauth_callbacks#kakao_auth'
+  end
+  # get '/kakao_auth' => 'devise/sessions#new'
   
   root 'movies#index'
   
